@@ -12,5 +12,7 @@ console couldn't be overriden directly :(
 if you click a wrong context (so an aera)
 a message appears Wrong context
 
+N.B: for the moment C. and D. are not taken into account from the console
+
 
 happy coding
