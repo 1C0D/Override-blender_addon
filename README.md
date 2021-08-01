@@ -1,18 +1,14 @@
-# Override
-from texteditor or console  
+# Override context from text_editor or console  
 
-you can pass some operators without taking care of the context  
-the context is given after you click the icon in the header and then the target area  
-for example 3D View  
+just pressing the icon in the header 
+then the target area (new context)
+check your OS console too
 
-if you are in console a temporary text is created in text editor  
-to excecute your command from the text editor  
-console couldn't be overriden directly :(   
+From console, this is creating a text in text editor, to override 
+so to print('result'), you can press the icon + shift
+ 
 
-if you click a wrong context (so an aera)
-a message appears Wrong context
-
-N.B: for the moment C. and D. are not taken into account from the console
-
+[Video](https://youtu.be/MPucyfiTkLs)
 
 happy coding
+
