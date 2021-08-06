@@ -2,10 +2,11 @@
 # https://b3d.interplanety.org/en/context-override/
 
 import bpy
+
 bl_info = {
     "name": "OVERRIDE",
     "author": "1C0D",  # thks to devtools addon, 3di & dr Sybren from blender chat
-    "version": (1, 1, 1),
+    "version": (1, 1, 2),
     "blender": (2, 93, 0),
     "location": "texteditor/console",
     "description": "OVERRIDE SCRIPT and console excecution",
@@ -14,7 +15,7 @@ bl_info = {
 
 
 console = 0
-active_text = None
+active_text = ""
 
 def expanse(line):
     if "C" or "D" in line.startswith(("C","D")):
@@ -137,23 +138,18 @@ class OVERRIDE_OT_text_editor(bpy.types.Operator): #run for console and text edi
                     new_context = override(context, *param)
                     try:
                         bpy.ops.text.run_script(new_context)
-                    except RuntimeError:
+                        self.report({'INFO'}, "EXECUTED! Check OS Console")
+                        return {'FINISHED'}
+                    except Exception:
+                        self.report({'ERROR'}, f"Wrong Context or Code Error(see Console)")
+                        return {'CANCELLED'}                     
+                    finally:
                         if console:
                             param = get_area(context, 'TEXT_EDITOR')
-                            clean_temp_text(param[2])
-                        self.report({'ERROR'}, "CONTEXT INCORRECT")
-
-                        return {'CANCELLED'}                
-
-        if console:
-            param = get_area(context, 'TEXT_EDITOR')            
-            clean_temp_text(param[2])
-
-            param = get_area(context, 'CONSOLE')
-            new_context = override(context, *param)
-            self.report({'INFO'}, "EXECUTED! Check OS Console")
-
-        return {'FINISHED'}
+                            try:
+                                clean_temp_text(param[2])
+                            except ReferenceError:
+                                pass
 
 
 def draw(self, context):
