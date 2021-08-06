@@ -5,7 +5,7 @@ import bpy
 bl_info = {
     "name": "OVERRIDE",
     "author": "1C0D",  # thks to devtools addon, 3di & dr Sybren from blender chat
-    "version": (1, 1, 0),
+    "version": (1, 1, 1),
     "blender": (2, 93, 0),
     "location": "texteditor/console",
     "description": "OVERRIDE SCRIPT and console excecution",
@@ -17,8 +17,8 @@ console = 0
 active_text = None
 
 def expanse(line):
-    if "C." or "D." in line:
-        line = line.replace("C.", "bpy.context.").replace("D.", "bpy.data.")
+    if "C" or "D" in line.startswith(("C","D")):
+        line = line.replace("C", "bpy.context").replace("D", "bpy.data")
     return line
 
 def printWrap(line):
@@ -167,6 +167,7 @@ def draw1(self, context):
 
 
 def register():
+
     bpy.utils.register_class(OVERRIDE_OT_text_editor)
     bpy.utils.register_class(OVERRIDE_OT_console)
     bpy.types.TEXT_HT_header.prepend(draw)
@@ -174,6 +175,7 @@ def register():
 
 
 def unregister():
+
     bpy.utils.unregister_class(OVERRIDE_OT_text_editor)
     bpy.utils.unregister_class(OVERRIDE_OT_console)
     bpy.types.TEXT_HT_header.remove(draw)
