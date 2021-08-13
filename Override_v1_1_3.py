@@ -6,7 +6,7 @@ import bpy
 bl_info = {
     "name": "OVERRIDE",
     "author": "1C0D",  # thks to devtools addon, 3di & dr Sybren from blender chat
-    "version": (1, 1, 3),
+    "version": (1, 1, 4),
     "blender": (2, 93, 0),
     "location": "texteditor/console",
     "description": "OVERRIDE SCRIPT and console excecution",
@@ -19,8 +19,8 @@ active_text = ""
 
 def expanse(line):
     print("line",line)
-    if line.startswith(("C","D")): #if any(c in L for c in ('a', 'e'))
-        line = line.replace("C", "bpy.context",1).replace("D", "bpy.data",1)
+    if ("C." or "D.") in line:
+        line = line.replace("C.", "bpy.context.").replace("D", "bpy.data.")
         print("line",line)
     return line
 
