@@ -6,7 +6,7 @@ import bpy
 bl_info = {
     "name": "OVERRIDE",
     "author": "1C0D",  # thks to devtools addon, 3di & dr Sybren from blender chat
-    "version": (1, 1, 2),
+    "version": (1, 1, 3),
     "blender": (2, 93, 0),
     "location": "texteditor/console",
     "description": "OVERRIDE SCRIPT and console excecution",
@@ -18,8 +18,10 @@ console = 0
 active_text = ""
 
 def expanse(line):
-    if "C" or "D" in line.startswith(("C","D")):
-        line = line.replace("C", "bpy.context").replace("D", "bpy.data")
+    print("line",line)
+    if line.startswith(("C","D")): #if any(c in L for c in ('a', 'e'))
+        line = line.replace("C", "bpy.context",1).replace("D", "bpy.data",1)
+        print("line",line)
     return line
 
 def printWrap(line):
@@ -82,9 +84,9 @@ def override(context, *param):
     }
 
 
-def clean_temp_text(area):
+def clean_temp_text(area=None):
     del_temp_text()
-    if console:
+    if console and area:
         area.spaces[0].text = active_text
 
 
@@ -139,17 +141,17 @@ class OVERRIDE_OT_text_editor(bpy.types.Operator): #run for console and text edi
                     try:
                         bpy.ops.text.run_script(new_context)
                         self.report({'INFO'}, "EXECUTED! Check OS Console")
-                        return {'FINISHED'}
-                    except Exception:
+                    except:
                         self.report({'ERROR'}, f"Wrong Context or Code Error(see Console)")
                         return {'CANCELLED'}                     
                     finally:
                         if console:
                             param = get_area(context, 'TEXT_EDITOR')
-                            try:
+                            if param:
                                 clean_temp_text(param[2])
-                            except ReferenceError:
-                                pass
+                            else:
+                                clean_temp_text()
+        return {'FINISHED'}
 
 
 def draw(self, context):
