@@ -2,11 +2,10 @@
 # https://b3d.interplanety.org/en/context-override/
 
 import bpy
-
 bl_info = {
     "name": "OVERRIDE",
     "author": "1C0D",  # thks to devtools addon, 3di & dr Sybren from blender chat
-    "version": (1, 1, 4),
+    "version": (1, 1, 5),
     "blender": (2, 93, 0),
     "location": "texteditor/console",
     "description": "OVERRIDE SCRIPT and console excecution",
@@ -15,13 +14,10 @@ bl_info = {
 
 
 console = 0
-active_text = ""
+active_text = None
 
 def expanse(line):
-    print("line",line)
-    if ("C." or "D.") in line:
-        line = line.replace("C.", "bpy.context.").replace("D", "bpy.data.")
-        print("line",line)
+    line = line.replace("C.", "bpy.context.").replace("D.", "bpy.data.")
     return line
 
 def printWrap(line):
@@ -31,8 +27,7 @@ def printWrap(line):
 def selectline_copy_suppr(self,context): # get text in console
     # selectline
     sc = context.space_data
-    line_object = sc.history[-1]
-    if line_object:
+    if line_object := sc.history[-1]:
         global line
         line = line_object.body
         line = expanse(line)
@@ -84,9 +79,9 @@ def override(context, *param):
     }
 
 
-def clean_temp_text(area=None):
+def clean_temp_text(area):
     del_temp_text()
-    if console and area:
+    if console:
         area.spaces[0].text = active_text
 
 
@@ -139,18 +134,28 @@ class OVERRIDE_OT_text_editor(bpy.types.Operator): #run for console and text edi
                     param=(window, screen, area, region)
                     new_context = override(context, *param)
                     try:
-                        bpy.ops.text.run_script(new_context)
-                        self.report({'INFO'}, "EXECUTED! Check OS Console")
-                    except:
-                        self.report({'ERROR'}, f"Wrong Context or Code Error(see Console)")
-                        return {'CANCELLED'}                     
-                    finally:
+                        if bpy.app.version > (3, 6, 0):
+                            with context.temp_override(**new_context):
+                                bpy.ops.text.run_script()
+                            break
+                        else:
+                            bpy.ops.text.run_script(new_context)
+                    except RuntimeError:
                         if console:
                             param = get_area(context, 'TEXT_EDITOR')
-                            if param:
-                                clean_temp_text(param[2])
-                            else:
-                                clean_temp_text()
+                            clean_temp_text(param[2])
+                        self.report({'ERROR'}, "CONTEXT INCORRECT")
+
+                        return {'CANCELLED'}
+
+        if console:
+            param = get_area(context, 'TEXT_EDITOR')
+            clean_temp_text(param[2])
+
+            param = get_area(context, 'CONSOLE')
+            new_context = override(context, *param)
+            self.report({'INFO'}, "EXECUTED! Check OS Console")
+
         return {'FINISHED'}
 
 
@@ -165,7 +170,6 @@ def draw1(self, context):
 
 
 def register():
-
     bpy.utils.register_class(OVERRIDE_OT_text_editor)
     bpy.utils.register_class(OVERRIDE_OT_console)
     bpy.types.TEXT_HT_header.prepend(draw)
@@ -173,7 +177,6 @@ def register():
 
 
 def unregister():
-
     bpy.utils.unregister_class(OVERRIDE_OT_text_editor)
     bpy.utils.unregister_class(OVERRIDE_OT_console)
     bpy.types.TEXT_HT_header.remove(draw)
