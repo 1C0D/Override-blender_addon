@@ -17,8 +17,7 @@ console = 0
 active_text = None
 
 def expanse(line):
-    if "C." or "D." in line:
-        line = line.replace("C.", "bpy.context.").replace("D.", "bpy.data.")
+    line = line.replace("C.", "bpy.context.").replace("D.", "bpy.data.")
     return line
 
 def printWrap(line):
@@ -28,8 +27,7 @@ def printWrap(line):
 def selectline_copy_suppr(self,context): # get text in console
     # selectline
     sc = context.space_data
-    line_object = sc.history[-1]
-    if line_object:
+    if line_object := sc.history[-1]:
         global line
         line = line_object.body
         line = expanse(line)
